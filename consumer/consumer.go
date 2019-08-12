@@ -2,8 +2,9 @@ package consumer
 
 import (
 	"context"
-	"github.com/go-redis/redis"
 	"time"
+
+	"github.com/go-redis/redis"
 )
 
 // A Message is a consumed message from a redis stream.
@@ -138,7 +139,7 @@ func (c *Consumer) Read(ctx context.Context) ([]Message, error) {
 }
 
 // Ack acknowledges the messages.
-func (c *Consumer) Ack(msgs ...Message) error {
+func (c *Consumer) Ack(ctx context.Context, msgs ...Message) error {
 	if len(msgs) == 0 {
 		return nil
 	}
@@ -148,7 +149,7 @@ func (c *Consumer) Ack(msgs ...Message) error {
 		ids[msg.Stream] = append(ids[msg.Stream], msg.ID)
 	}
 
-	_, err := c.client.Pipelined(func(p redis.Pipeliner) error {
+	_, err := c.client.WithContext(ctx).Pipelined(func(p redis.Pipeliner) error {
 		for stream, msgIDs := range ids {
 			p.XAck(stream, c.cfg.group, msgIDs...)
 		}
