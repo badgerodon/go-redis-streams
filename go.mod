@@ -1,4 +1,4 @@
-module github.com/badgerodon/go-redis
+module github.com/badgerodon/go-redis-streams
 
 go 1.12
 
